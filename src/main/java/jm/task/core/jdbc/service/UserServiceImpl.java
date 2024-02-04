@@ -9,8 +9,9 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserDaoJDBCImpl userDao;
+
+    //- сервис ничего не должен знать о соединениях класса Util - вырежи
     public UserServiceImpl() {
-        Util.initMySQLConnection();
         userDao = new UserDaoJDBCImpl();
     }
     public void createUsersTable() {
@@ -21,8 +22,10 @@ public class UserServiceImpl implements UserService {
         userDao.dropUsersTable();
     }
 
+    //- sout перенеси в сервис - бизнес логика там
     public void saveUser(String name, String lastName, byte age) {
         userDao.saveUser(name, lastName, age);
+        System.out.println("User с именем – " + name + " добавлен в базу данных ");
     }
 
     public void removeUserById(long id) {

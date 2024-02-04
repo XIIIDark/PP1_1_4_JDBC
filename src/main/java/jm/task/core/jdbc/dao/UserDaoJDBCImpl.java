@@ -9,10 +9,11 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-    private final Connection conn;
-    public UserDaoJDBCImpl() {
-        this.conn = Util.getMySQLConnection();
-    }
+    /* в ресурсах каждого метода надо гарантированно закрывать помимо стейтмента еще и коннекшн - для разделения используй ;
+
+    - sout перенеси в сервис - бизнес логика там
+
+    - удали комментированный код*/
 
     public void createUsersTable() {
 
@@ -24,7 +25,8 @@ public class UserDaoJDBCImpl implements UserDao {
                 + "    constraint users_pk\n"
                 + "        primary key (user_id)\n" + ");";
 
-        try (Statement statement = conn.createStatement()) {
+        try (Connection conn = Util.getMySQLConnection();
+             Statement statement = conn.createStatement()) {
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             if (!e.getMessage().equals("Table 'users' already exists")) {
@@ -37,7 +39,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
         String sql = "drop table myschemas.users;";
 
-        try (Statement statement = conn.createStatement()){
+        try (Connection conn = Util.getMySQLConnection();
+             Statement statement = conn.createStatement()){
             statement.executeUpdate(sql);
         } catch (SQLException e) {
             if (!e.getMessage().equals("Unknown table 'myschemas.users'")) {
@@ -51,12 +54,12 @@ public class UserDaoJDBCImpl implements UserDao {
         String sql = "INSERT INTO myschemas.users (user_name, user_lastname, user_age)\n" +
                 " VALUES (?, ?, ?); ";
 
-        try (PreparedStatement statement = conn.prepareStatement(sql)){
+        try (Connection conn = Util.getMySQLConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)){
             statement.setString(1, name);
             statement.setString(2, lastName);
             statement.setByte(3, age);
             statement.executeUpdate();
-            System.out.println("User с именем – " + name + " добавлен в базу данных ");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +70,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
         String sql = "DELETE FROM myschemas.users WHERE user_id = ?; ";
 
-        try (PreparedStatement statement = conn.prepareStatement(sql)){
+        try (Connection conn = Util.getMySQLConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)){
             statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -80,10 +84,10 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM myschemas.users ;";
 
-        try (Statement statement = conn.createStatement()) {
+        try (Connection conn = Util.getMySQLConnection();
+             Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
-                //Long userID = rs.getLong("user_id");
                 String userName = rs.getString("user_name");
                 String userLastname = rs.getString("user_lastname");
                 Byte userAge = rs.getByte("user_age");
@@ -100,10 +104,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
         String sql = "DELETE FROM myschemas.users;";
 
-        try (Statement statement = conn.createStatement()) {
+        try (Connection conn = Util.getMySQLConnection();
+             Statement statement = conn.createStatement()) {
             statement.executeUpdate(sql);
         } catch (SQLException e) {
-//            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
 

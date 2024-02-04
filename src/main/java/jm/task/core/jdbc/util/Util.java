@@ -15,15 +15,14 @@ public class Util {
     private static final String PASSWORD = "uGV!hu3.24sdf";
     private static Connection conn = null;
 
+    //    - при каждом обращении к getMySQLConnection() возвращай новый коннекшн
     public static Connection getMySQLConnection() {
+        initMySQLConnection();
         return conn;
     }
 
-    public static void closeMySQLConnection() throws SQLException {
-        conn.close();
-    }
 
-    public static void initMySQLConnection() {
+    private static void initMySQLConnection() {
 
         String connectionURL = "jdbc:mysql://" + HOST_NAME + ":3306/" + DB_NAME;
 
